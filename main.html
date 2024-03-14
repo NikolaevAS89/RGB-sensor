@@ -1,0 +1,67 @@
+<!DOCTYPE HTML>
+
+<html>
+   <head>
+      <script type = "text/javascript">
+         var ws = null;
+         function verifyHost() {
+            if(!document.getElementById('txtIpv4').value.length){
+                document.getElementById("bttnConnect").disabled = true;
+            }else{
+                document.getElementById("bttnConnect").disabled = false;
+            }
+         }
+         function verifyMessage() {
+            if(!document.getElementById('txtMessage').value.length){
+                document.getElementById("bttnAction").disabled = true;
+            }else{
+                document.getElementById("bttnAction").disabled = false;
+            }
+         }
+         function connect() {
+            if ("WebSocket" in window) {
+               host = document.getElementById('txtIpv4').value
+               ws = new WebSocket("ws://"+host);
+
+
+               ws.onmessage = function (evt) {
+                  var received_msg = evt.data;
+                  showMessage("<<"+received_msg);
+               };
+
+               ws.onclose = function() {
+                  // websocket is closed.
+                  alert("Connection is closed...");
+               };
+            } else {
+               // The browser doesn't support WebSocket
+               alert("WebSocket NOT supported by your Browser!");
+            }
+         }
+
+         function disconnect() {
+         }
+         
+         function showMessage(text) {
+            taLog = document.getElementById('taLog');
+            if(taLog.value.length) {
+               taLog.value += "\n";
+            }
+            taLog.value += text;
+         }
+
+         function sendMassage() {
+            txtMessage = document.getElementById('txtMessage');
+            showMessage(">>"+txtMessage.value);
+            ws.send(txtMessage.value)
+         }
+      </script>
+   </head>
+   <body>
+      <input type="text" class="form-input" id="txtIpv4" name="txtIpv4" placeholder="host:port" onkeyup="verifyHost()"/>
+      <button onclick="connect()" id="bttnConnect" name="bttnConnect" disabled=false>Connect</button></br>
+      <textarea id="taLog" name="taLog" rows="4" cols="50" readonly></textarea></br>
+      <input type="text" class="form-input" id="txtMessage" name="txtMessage" placeholder="text" onkeyup="verifyMessage()"/>
+      <button onclick="sendMassage()" id="bttnAction" name="bttnAction" disabled=false>Send</button></br>
+   </body>
+</html>
